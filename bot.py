@@ -16,8 +16,7 @@ user_history = {}
 
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
-    print(f"🔥 JOIN REQUEST DETECTED - User: {request.user_chat_id}")
-    
+    print(f"🔥 JOIN REQUEST DETECTED from user {request.user_chat_id}")
     user_id = request.user_chat_id
     chat_id = request.chat.id
     first_name = request.from_user.first_name or "User"
@@ -38,7 +37,7 @@ async def handle_join_request(client, request):
         )
         print(f"✅ PM verifikasi BERHASIL dikirim ke {user_id}")
     except Exception as e:
-        print(f"❌ GAGAL kirim PM ke {user_id}: {e}")
+        print(f"❌ Gagal kirim PM ke {user_id}: {e}")
 
 @app.on_message(filters.group)
 async def sangmata_tracker(client, message):
