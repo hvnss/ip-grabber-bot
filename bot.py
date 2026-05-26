@@ -14,15 +14,16 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Bersihkan webhook lama dengan logging detail
+# Bersihkan webhook lama
 print("Removing old webhook...")
 try:
     bot.remove_webhook()
     print("Old webhook removed successfully")
 except Exception as e:
-    print("Failed to remove webhook:", str(e))
+    print("Failed to remove webhook:")
+    print(traceback.format_exc())
 
-time.sleep(10)  # Tunggu lebih lama agar Telegram membersihkan instance lama
+time.sleep(10)
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
@@ -45,7 +46,8 @@ def handle_join_request(request: types.ChatJoinRequest):
         )
         print("Verification link sent to user", user_id)
     except Exception as e:
-        print("Failed to send message to", user_id, ":", str(e))
+        print("Failed to send message to", user_id, ":")
+        print(traceback.format_exc())
 
 @bot.message_handler(commands=['start'])
 def start(message):
