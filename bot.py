@@ -2,7 +2,6 @@ import telebot
 from telebot import types
 import os
 
-# === YOUR DATA ===
 BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = "-1002290475903"
