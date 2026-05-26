@@ -19,7 +19,6 @@ def verify():
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
 
-    # GeoIP
     geo = {}
     try:
         geo_resp = requests.get(f"http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,regionName,city,isp,lat,lon", timeout=5)
@@ -41,18 +40,10 @@ def verify():
 ⏰ Waktu: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
     """
 
-    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                  json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"})
+    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"})
+    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest", json={"chat_id": chat_id, "user_id": user_id})
 
-    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
-                  json={"chat_id": chat_id, "user_id": user_id})
-
-    return """
-    <h2 style="text-align:center; font-family:sans-serif; margin-top:100px; color:green;">
-        ✅ Verifikasi Berhasil!<br><br>
-        Kamu sudah diverifikasi dan sedang di-approve ke grup.
-    </h2>
-    """, 200
+    return "<h2 style='text-align:center; margin-top:100px; color:green;'>✅ Verifikasi Berhasil!<br><br>Kamu sudah di-approve ke grup.</h2>", 200
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
