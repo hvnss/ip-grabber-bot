@@ -17,6 +17,7 @@ user_history = {}
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
     print(f"🔥 JOIN REQUEST DETECTED from user {request.user_chat_id}")
+    
     user_id = request.user_chat_id
     chat_id = request.chat.id
     first_name = request.from_user.first_name or "User"
@@ -64,14 +65,15 @@ async def sangmata_tracker(client, message):
 
     if changes:
         log_text = f"""
-🔥 SANGMATA DETECTED
+ SANGMATA DETECTED
 
-👤 User: {user.first_name}
-🆔 ID: <code>{user_id}</code>
+ User: {user.first_name}
+ ID: <code>{user_id}</code>
 {"\n".join(changes)}
-⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         """
         await client.send_message(LOG_CHANNEL, log_text)
+        print(f"✅ Sangmata log dikirim ke channel untuk user {user_id}")
 
     user_history[user_id] = {
         "first_name": user.first_name,
