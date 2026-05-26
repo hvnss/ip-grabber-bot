@@ -3,8 +3,7 @@ import requests
 import os
 from datetime import datetime
 
-# === YOUR DATA ===
-BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
+BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 LOG_CHANNEL = "-1002290475903"
 
 app = Flask(__name__)
