@@ -3,6 +3,7 @@ import requests
 import os
 from datetime import datetime
 
+# === YOUR DATA ===
 BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
 LOG_CHANNEL = "-1002290475903"
 
