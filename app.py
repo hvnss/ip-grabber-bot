@@ -2,11 +2,28 @@ from flask import Flask, request
 import requests
 import os
 from datetime import datetime
+import json
+import telebot
 
-BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
-LOG_CHANNEL = "-1002290475903"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+LOG_CHANNEL = os.environ.get("LOG_CHANNEL")
+WEB_URL = os.environ.get("WEB_URL")
 
 app = Flask(__name__)
+bot = telebot.TeleBot(BOT_TOKEN)
+
+# Import bot handlers
+import bot as bot_module
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    """Handle incoming Telegram updates via webhook"""
+    try:
+        update = telebot.types.Update.de_json(request.stream.read().decode("utf-8"))
+        bot.process_new_updates([update])
+    except Exception as e:
+        print(f"Webhook error: {e}")
+    return "OK", 200
 
 @app.route('/verify')
 def verify():
@@ -57,3 +74,4 @@ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
+
