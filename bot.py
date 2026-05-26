@@ -7,7 +7,7 @@ BOT_TOKEN = os.getenv('8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI')
 WEB_URL = os.getenv('https://ip-grabber-bot-production.up.railway.app')
 LOG_CHANNEL = os.getenv('-1003976117318')
 
-bot = telebot.TeleBot(BOT_TOKEN)
+bot = telebot.TeleBot(8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI)
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
