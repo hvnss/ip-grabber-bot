@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 import os
+import time
 
 BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
@@ -14,6 +15,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 bot.remove_webhook()
 print("Old webhook removed successfully")
+time.sleep(8)   # tunggu lebih lama agar Telegram bersihkan instance lama
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
