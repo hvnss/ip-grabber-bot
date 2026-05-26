@@ -1,21 +1,12 @@
 from flask import Flask, request
 import requests
-import telebot
 import os
 from datetime import datetime
-import bot as bot_module
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg")
-LOG_CHANNEL = os.environ.get("LOG_CHANNEL", "-1002290475903")
+BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
+LOG_CHANNEL = "-1002290475903"
 
 app = Flask(__name__)
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    json_data = request.get_json(force=True)
-    update = telebot.types.Update.de_json(json_data)
-    bot_module.bot.process_new_updates([update])
-    return "OK", 200
 
 @app.route('/verify')
 def verify():
