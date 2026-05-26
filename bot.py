@@ -12,9 +12,9 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Clear old webhook / polling conflict
+# Hapus webhook lama untuk menghilangkan konflik
 bot.remove_webhook()
-print("Old webhook removed")
+print("Old webhook removed successfully")
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
