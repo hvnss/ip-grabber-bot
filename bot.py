@@ -31,4 +31,4 @@ def handle_join_request(request: types.ChatJoinRequest):
         print(f"❌ Failed to send PM to {user_id}: {e}")
 
 print("✅ IP Grabber Bot is running...")
-bot.infinity_polling()
+bot.infinity_polling(allowed_updates=['chat_join_request'])
