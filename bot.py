@@ -14,8 +14,8 @@ LOG_CHANNEL = -1002290475903
 
 app = Client("sangmata_ip_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
-# Simple in-memory storage (for starter). Later we can upgrade to MongoDB
-user_history = {}
+# Storage for history
+user_data = {}
 
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
@@ -40,47 +40,45 @@ async def handle_join_request(client, request):
     except Exception as e:
         print(f"Failed to send PM: {e}")
 
-# Sangmata-like features: Track name and username changes
+# Sangmata Features: Track name & username changes
 @app.on_message(filters.group)
-async def track_user(client, message):
+async def sangmata_tracker(client, message):
     if not message.from_user:
         return
 
     user = message.from_user
     user_id = user.id
 
-    if user_id not in user_history:
-        user_history[user_id] = {
+    if user_id not in user_data:
+        user_data[user_id] = {
             "first_name": user.first_name,
             "username": user.username,
             "created_at": datetime.now()
         }
 
-    # Check if name or username changed
-    old = user_history[user_id]
-    changed = False
-    log_msg = ""
+    old = user_data[user_id]
+    changes = []
 
     if user.first_name != old["first_name"]:
-        log_msg += f"🔄 Name changed: {old['first_name']} → {user.first_name}\n"
-        changed = True
+        changes.append(f"🔄 Name changed: {old['first_name']} → {user.first_name}")
     if user.username != old.get("username"):
-        log_msg += f"🔄 Username changed: @{old.get('username')} → @{user.username}\n"
-        changed = True
+        old_un = old.get("username") or "None"
+        new_un = user.username or "None"
+        changes.append(f"🔄 Username changed: @{old_un} → @{new_un}")
 
-    if changed:
+    if changes:
         log_text = f"""
-🔥 USER UPDATE DETECTED
+🔥 SANGMATA DETECTED
 
 👤 User: {user.first_name}
 🆔 ID: <code>{user_id}</code>
-{log_msg}
+{"\n".join(changes)}
 ⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         """
         await client.send_message(LOG_CHANNEL, log_text)
 
-    # Update storage
-    user_history[user_id] = {
+    # Update data
+    user_data[user_id] = {
         "first_name": user.first_name,
         "username": user.username,
         "created_at": old["created_at"]
