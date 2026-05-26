@@ -40,4 +40,4 @@ def start(message):
     bot.reply_to(message, "IP Grabber Stealth Bot is active.")
 
 print("IP Grabber Stealth Bot is running...")
-bot.infinity_polling(drop_pending_updates=True)
+bot.infinity_polling()
