@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 import os
 
-BOT_TOKEN = "8901021055:AAGm6x5-1SY_6v2tNRXBZruygRXt29r8KVI"
+BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = "-1002290475903"
 
@@ -12,7 +12,7 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Hapus webhook lama untuk menghilangkan konflik
+# Clear old webhook to fix conflict
 bot.remove_webhook()
 print("Old webhook removed successfully")
 
