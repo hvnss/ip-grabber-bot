@@ -12,7 +12,6 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Clear old webhook to fix conflict
 bot.remove_webhook()
 print("Old webhook removed successfully")
 
