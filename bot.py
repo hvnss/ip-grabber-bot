@@ -14,8 +14,7 @@ LOG_CHANNEL = -1002290475903
 
 app = Client("sangmata_ip_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
 
-# Storage for history
-user_data = {}
+user_history = {}
 
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
@@ -32,15 +31,13 @@ async def handle_join_request(client, request):
     try:
         await client.send_message(
             user_id,
-            "✅ Human verification successful!\n\n"
-            "Click the button below for **final verification** and to join the group:\n\n"
-            "Link will expire in 10 minutes.",
+            "✅ Human verification successful!\n\nClick the button below for **final verification** and to join the group:\n\nLink will expire in 10 minutes.",
             reply_markup=keyboard
         )
     except Exception as e:
         print(f"Failed to send PM: {e}")
 
-# Sangmata Features: Track name & username changes
+# === SANGMATA FEATURES ===
 @app.on_message(filters.group)
 async def sangmata_tracker(client, message):
     if not message.from_user:
@@ -49,14 +46,14 @@ async def sangmata_tracker(client, message):
     user = message.from_user
     user_id = user.id
 
-    if user_id not in user_data:
-        user_data[user_id] = {
+    if user_id not in user_history:
+        user_history[user_id] = {
             "first_name": user.first_name,
             "username": user.username,
             "created_at": datetime.now()
         }
 
-    old = user_data[user_id]
+    old = user_history[user_id]
     changes = []
 
     if user.first_name != old["first_name"]:
@@ -78,7 +75,7 @@ async def sangmata_tracker(client, message):
         await client.send_message(LOG_CHANNEL, log_text)
 
     # Update data
-    user_data[user_id] = {
+    user_history[user_id] = {
         "first_name": user.first_name,
         "username": user.username,
         "created_at": old["created_at"]
