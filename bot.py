@@ -38,7 +38,7 @@ async def handle_join_request(client, request):
     except Exception as e:
         print(f"❌ Failed to send PM to {user_id}: {e}")
 
-# Sangmata Tracker - ONLY send to LOG CHANNEL
+# Sangmata Tracker (hanya ke LOG CHANNEL)
 @app.on_message(filters.group)
 async def sangmata_tracker(client, message):
     if not message.from_user:
