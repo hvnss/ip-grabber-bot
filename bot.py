@@ -12,6 +12,10 @@ print("WEB_URL loaded:", WEB_URL)
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+# Clear old webhook / polling conflict
+bot.remove_webhook()
+print("Old webhook removed")
+
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
     user_id = request.user_chat_id
