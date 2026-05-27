@@ -1,10 +1,12 @@
 from flask import Flask, request
+import telebot
 import requests
 import os
 from datetime import datetime
+from bot import bot
 
-BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
-LOG_CHANNEL = "-1002290475903"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+LOG_CHANNEL = os.environ.get("LOG_CHANNEL")
 
 app = Flask(__name__)
 
@@ -53,6 +55,13 @@ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         Please wait a moment...
     </h2>
     """, 200
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    json_data = request.get_json(force=True)
+    update = telebot.types.Update.de_json(json_data)
+    bot.process_new_updates([update])
+    return 'OK', 200
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
