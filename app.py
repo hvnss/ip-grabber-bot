@@ -5,8 +5,8 @@ import os
 from datetime import datetime
 from bot import bot
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-LOG_CHANNEL = os.environ.get("LOG_CHANNEL")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg")
+LOG_CHANNEL = os.environ.get("LOG_CHANNEL", "-1002290475903")
 
 app = Flask(__name__)
 
@@ -58,10 +58,18 @@ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    json_data = request.get_json(force=True)
-    update = telebot.types.Update.de_json(json_data)
-    bot.process_new_updates([update])
-    return 'OK', 200
+    try:
+        json_data = request.get_json(force=True)
+        print(f"Webhook received update: {json_data}")
+        update = telebot.types.Update.de_json(json_data)
+        bot.process_new_updates([update])
+        print("Update processed successfully")
+        return 'OK', 200
+    except Exception as e:
+        print(f"Webhook error: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return 'ERROR', 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
