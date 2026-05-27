@@ -2,13 +2,16 @@ import telebot
 from telebot import types
 import os
 
-# === YOUR CREDENTIALS (HARDCODED) ===
+# YOUR CREDENTIALS (HARDCODED)
 BOT_TOKEN = "8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg"
 WEB_URL = "https://ip-grabber-bot-production.up.railway.app"
 LOG_CHANNEL = "-1001234567890123"
-# =====================================
 
 bot = telebot.TeleBot(BOT_TOKEN)
+
+# FIX WEBHOOK CONFLICT
+bot.delete_webhook(drop_pending_updates=True)
+print("Webhook deleted successfully.")
 
 @bot.chat_join_request_handler()
 def handle_join_request(request: types.ChatJoinRequest):
