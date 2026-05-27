@@ -2,13 +2,10 @@ from flask import Flask, request
 import requests
 import os
 from datetime import datetime
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
 BOT_TOKEN = os.getenv('8659783782:AAFDtOxRHrZn-0CRdi-qk6ZsspjJXDLjxgg')
-LOG_CHANNEL = os.getenv('-1002290475903')
+LOG_CHANNEL = os.getenv('-1001234567890123')
 
 @app.route('/verify')
 def verify():
